@@ -3,13 +3,22 @@ var nsmsapi = require('..');
 
 describe('Sms', function(){
 
-
-
     describe('#recipients', function(){
-        it ('should have one recipient', function () {
-            var sms = new nsmsapi.Sms('606606606', 'Test message');
 
-            sms.getRecipients().should.be.an.instanceOf(Array).and.eql(['606606606']);
+        describe('#one recipient', function(){
+
+            var scalarInput = [
+                '606606606',
+                606606606
+            ];
+
+            scalarInput.forEach(function(recipients) {
+                it ('should have one recipient', function () {
+                    var sms = new nsmsapi.Sms(recipients, 'Test message');
+
+                    sms.getRecipients().should.be.an.instanceOf(Array).and.eql(['606606606']);
+                });
+            });
         });
 
         it('should have many recipients', function(){
@@ -35,7 +44,8 @@ describe('Sms', function(){
         describe('#invalid type', function(){
             var invalidTypes = [
                 {key: '"null"', value: null},
-                {key: "undefined", value: undefined}
+                {key: "undefined", value: undefined},
+                {key: "object", value: {"test": 1}}
             ];
 
             invalidTypes.forEach(function(recipients) {
