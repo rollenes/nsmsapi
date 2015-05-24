@@ -60,7 +60,8 @@ describe('Sms', function(){
         describe('#invalid', function(){
             var invalidRecipient = [
                 '48abc124',
-                ['603322424', 'invalid']
+                ['603322424', 'invalid'],
+                [['603322424']]
             ];
 
             invalidRecipient.forEach(function(recipients) {
@@ -78,6 +79,18 @@ describe('Sms', function(){
             var sms = new nsmsapi.Sms('603322424', 'Test message');
 
             sms.getMessage().should.equal('Test message');
+        });
+
+        it ('should rise invalid message type error for not a string', function(){
+            (function() {
+                new nsmsapi.Sms('606606606', null);
+            }).should.throwError('Invalid message type');
+        });
+
+        it('should rise empty message error', function() {
+            (function() {
+                new nsmsapi.Sms('606606606', '');
+            }).should.throwError('Empty message');
         });
     });
 });
