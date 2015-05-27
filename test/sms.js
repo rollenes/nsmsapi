@@ -1,4 +1,4 @@
-var assert = require("should");
+var should = require("should");
 var nsmsapi = require('..');
 
 describe('Sms', function(){
@@ -36,7 +36,9 @@ describe('Sms', function(){
 
             emptyRecipients.forEach(function(recipients) {
                 it('should rise empty recipient error for: ' + recipients.key , function() {
-                    (function() {new nsmsapi.Sms(recipients.value, 'Test message');}).should.throwError('Empty recipients');
+                    (function() {
+                        new nsmsapi.Sms(recipients.value, 'Test message');
+                    }).should.throwError('Empty recipients');
                 });
             })
         });
@@ -57,7 +59,7 @@ describe('Sms', function(){
             })
         });
 
-        describe('#invalid', function(){
+        describe('#invalid number', function(){
             var invalidRecipient = [
                 '48abc124',
                 ['603322424', 'invalid'],
