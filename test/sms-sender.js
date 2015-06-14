@@ -1,8 +1,6 @@
 var should = require("should");
 var nock = require('nock');
 var nsmsapi = require('..');
-var crypto = require('crypto');
-var md5sum = crypto.createHash('md5');
 
 describe('SmsSender', function(){
 
@@ -26,22 +24,42 @@ describe('SmsSender', function(){
 
     it('should send sms to default endpoint', function(done){
 
-        var val = {
+        var request = {
             username: 'test',
             password: '098f6bcd4621d373cade4e832627b4f6',
-            format: 'json'
+            format: 'json',
+            encoding: 'utf-8',
+            to: '603322424',
+            message: 'This is test'
+        };
+
+        var response = {
+            "count": 1,
+            "list": [
+                {
+                    "id":"1434295969943616450",
+                    "points":0.065,
+                    "number":"48603322424",
+                    "submitted_number":"603322424",
+                    "status":"QUEUE",
+                    "error":null,
+                    "idx":null
+                }
+            ]
         };
 
         var scope = nock('https://ssl.smsapi.pl')
-            .post('/sms.do', val)
-            .reply(200, {id: 6060606060});
+            .post('/sms.do', request)
+            .reply(200, response);
 
         var sender = new nsmsapi.SmsSender({
             username: 'test',
             password: 'test'
         });
 
-        sender.send(function(err, res, body) {
+        var sms = new nsmsapi.Sms('603322424', 'This is test');
+
+        sender.send(sms, function(err, res, body) {
             scope.done();
             done();
         });
