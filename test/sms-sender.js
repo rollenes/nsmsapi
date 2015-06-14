@@ -1,6 +1,8 @@
 var should = require("should");
 var nock = require('nock');
 var nsmsapi = require('..');
+var crypto = require('crypto');
+var md5sum = crypto.createHash('md5');
 
 describe('SmsSender', function(){
 
@@ -22,19 +24,24 @@ describe('SmsSender', function(){
         }).should.throwError('Password required');
     });
 
-    it('should send sms to default endpoint', function(){
+    it('should send sms to default endpoint', function(done){
+
+        var val = {
+            username: 'test',
+            password: '098f6bcd4621d373cade4e832627b4f6',
+            format: 'json'
+        };
 
         var scope = nock('https://ssl.smsapi.pl')
-            .post('/sms.do')
-            .reply(200, 'OK');
+            .post('/sms.do', val)
+            .reply(200, {id: 6060606060});
 
         var sender = new nsmsapi.SmsSender({
             username: 'test',
             password: 'test'
-        })
+        });
 
-        sender.send(function(err, req, body) {
-            console.log(body)
+        sender.send(function(err, res, body) {
             scope.done();
             done();
         });
