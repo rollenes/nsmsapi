@@ -1,0 +1,26 @@
+{
+    "singleSms": {
+        "request": {
+            "username": "test",
+            "password": "098f6bcd4621d373cade4e832627b4f6",
+            "format": "json",
+            "encoding": "utf-8",
+            "to": "603322424",
+            "message": "This is test"
+        },
+        "response": {
+            "count": 1,
+            "list": [
+                {
+                    "id":"1434295969943616450",
+                    "points":0.065,
+                    "number":"48603322424",
+                    "submitted_number":"603322424",
+                    "status":"QUEUE",
+                    "error":null,
+                    "idx":null
+                }
+            ]
+        }
+    }
+}

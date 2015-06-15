@@ -1,6 +1,7 @@
 var should = require("should");
 var nock = require('nock');
 var nsmsapi = require('..');
+var fixtures = require('./fixtures/sms.json');
 
 describe('SmsSender', function(){
 
@@ -22,48 +23,46 @@ describe('SmsSender', function(){
         }).should.throwError('Password required');
     });
 
-    it('should send sms to default endpoint', function(done){
+    describe('#send', function(){
+        it('should send sms to default endpoint', function(done){
 
-        var request = {
-            username: 'test',
-            password: '098f6bcd4621d373cade4e832627b4f6',
-            format: 'json',
-            encoding: 'utf-8',
-            to: '603322424',
-            message: 'This is test'
-        };
+            var scope = nock('https://ssl.smsapi.pl')
+                .post('/sms.do', fixtures.singleSms.request)
+                .reply(200, fixtures.singleSms.response);
 
-        var response = {
-            "count": 1,
-            "list": [
-                {
-                    "id":"1434295969943616450",
-                    "points":0.065,
-                    "number":"48603322424",
-                    "submitted_number":"603322424",
-                    "status":"QUEUE",
-                    "error":null,
-                    "idx":null
-                }
-            ]
-        };
+            var sender = new nsmsapi.SmsSender({
+                username: 'test',
+                password: 'test'
+            });
 
-        var scope = nock('https://ssl.smsapi.pl')
-            .post('/sms.do', request)
-            .reply(200, response);
+            var sms = new nsmsapi.Sms('603322424', 'This is test');
 
-        var sender = new nsmsapi.SmsSender({
-            username: 'test',
-            password: 'test'
+            sender.send(sms, function(err, res, body) {
+                scope.done();
+                done();
+            });
         });
 
-        var sms = new nsmsapi.Sms('603322424', 'This is test');
+        it('should send sms to custom endpoint', function(done){
 
-        sender.send(sms, function(err, res, body) {
-            scope.done();
-            done();
+            var scope = nock('http://localhost:8080')
+                .post('/', fixtures.singleSms.request)
+                .reply(200, fixtures.singleSms.response);
+
+            var sender = new nsmsapi.SmsSender({
+                username: 'test',
+                password: 'test',
+                endpoint: 'http://localhost:8080'
+            });
+
+            var sms = new nsmsapi.Sms('603322424', 'This is test');
+
+            sender.send(sms, function(err, res, body) {
+                scope.done();
+                done();
+            });
         });
     });
 
-    it('should send sms to custom endpoint')
+
 });
