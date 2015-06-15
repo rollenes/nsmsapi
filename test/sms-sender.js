@@ -1,7 +1,6 @@
 var should = require("should");
 var nock = require('nock');
 var nsmsapi = require('..');
-var fixtures = require('./fixtures/sms.json');
 
 describe('SmsSender', function(){
 
@@ -23,12 +22,30 @@ describe('SmsSender', function(){
         }).should.throwError('Password required');
     });
 
-    describe('#send', function(){
+    describe('#invalid endpoint', function(){
+        var invalidEndpoints = [
+            undefined,
+            '',
+            {}
+        ];
+
+        invalidEndpoints.forEach(function(endpoint){
+            it('should rice error for: ' + typeof endpoint, function() {
+                (function () {
+                    new nsmsapi.SmsSender({username: 'test', password: 'test', endpoint: endpoint})
+                }).should.throwError('Invalid endpoint');
+            });
+        });
+    });
+
+    describe('#send', function() {
+        var singleSms = require('./fixtures/singleSms.json');
+
         it('should send sms to default endpoint', function(done){
 
             var scope = nock('https://ssl.smsapi.pl')
-                .post('/sms.do', fixtures.singleSms.request)
-                .reply(200, fixtures.singleSms.response);
+                .post('/sms.do', singleSms.request)
+                .reply(200, singleSms.response);
 
             var sender = new nsmsapi.SmsSender({
                 username: 'test',
@@ -46,8 +63,8 @@ describe('SmsSender', function(){
         it('should send sms to custom endpoint', function(done){
 
             var scope = nock('http://localhost:8080')
-                .post('/', fixtures.singleSms.request)
-                .reply(200, fixtures.singleSms.response);
+                .post('/', singleSms.request)
+                .reply(200, singleSms.response);
 
             var sender = new nsmsapi.SmsSender({
                 username: 'test',
@@ -63,6 +80,4 @@ describe('SmsSender', function(){
             });
         });
     });
-
-
 });
